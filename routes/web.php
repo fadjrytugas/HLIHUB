@@ -35,6 +35,7 @@ Route::middleware('dashboard.auth')->group(function (): void {
     Route::post('/isu-strategis', [IsuStrategisController::class, 'store'])->name('isu-strategis.store');
     Route::get('/isu-strategis/{isuStrategi}/edit', [IsuStrategisController::class, 'edit'])->name('isu-strategis.edit');
     Route::put('/isu-strategis/{isuStrategi}', [IsuStrategisController::class, 'update'])->name('isu-strategis.update');
+    Route::delete('/isu-strategis/{isuStrategi}', [IsuStrategisController::class, 'destroy'])->name('isu-strategis.destroy');
     Route::get('/tracking-kegiatan', [TrackingController::class, 'index'])->name('tracking.index');
     Route::get('/stakeholder', [StakeholderController::class, 'index'])->name('stakeholders.index');
     Route::post('/stakeholder', [StakeholderController::class, 'store'])->name('stakeholders.store');

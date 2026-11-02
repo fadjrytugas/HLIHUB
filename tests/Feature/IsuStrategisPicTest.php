@@ -109,4 +109,38 @@ class IsuStrategisPicTest extends TestCase
             ->assertSee('KETERANGAN UPDATE')
             ->assertSee('Progres diperbarui menjadi tahap koordinasi dengan stakeholder.');
     }
+
+    public function test_deleting_issue_also_deletes_its_tracking_records(): void
+    {
+        $issue = IsuStrategis::query()->create([
+            'unit_lembaga_pengusul' => 'Unit Hapus',
+            'stakeholder' => 'Stakeholder Hapus',
+            'klasifikasi_strategis' => 'Klasifikasi Hapus',
+            'kegiatan' => 'Kegiatan Hapus',
+            'tanggal_masuk' => '2026-10-16',
+            'deadline' => '2026-10-30',
+            'progres' => 10,
+        ]);
+        $tracking = $issue->tracking()->create([
+            'tahap_ke' => 1,
+            'nama_tahap' => 'Tahap Uji Hapus',
+            'sla_hari_kerja' => 5,
+            'status' => 'ACTIVE',
+        ]);
+
+        $this->withSession(['dashboard_authenticated' => true])
+            ->get(route('isu-strategis.data', ['q' => 'Kegiatan Hapus']))
+            ->assertOk()
+            ->assertSee('Hapus')
+            ->assertSee(route('isu-strategis.destroy', $issue), false)
+            ->assertSee('data-confirm-delete', false)
+            ->assertSee('deleteConfirmModal', false);
+
+        $this->withSession(['dashboard_authenticated' => true])
+            ->delete(route('isu-strategis.destroy', $issue))
+            ->assertRedirect('/');
+
+        $this->assertDatabaseMissing('isu_strategis', ['no' => $issue->no]);
+        $this->assertDatabaseMissing('isu_strategis_trackings', ['id' => $tracking->id]);
+    }
 }

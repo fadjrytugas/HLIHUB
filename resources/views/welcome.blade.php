@@ -315,7 +315,7 @@
                                 <td>{!! $pointList($issue->dampak) !!}</td>
                                 <td>{{ optional($issue->terakhir_di_update)->format('d M Y H:i') ?: '-' }}</td>
                                 <td>{{ $issue->keterangan_update ?: '-' }}</td>
-                                <td><button type="button" class="resume-button" data-resume="{{ e(json_encode(['kegiatan' => $issue->kegiatan, 'unit' => $issue->unit_lembaga_pengusul, 'pic_unit' => $issue->pic_orang_unit_lembaga_pengusul, 'pic' => $issue->pic, 'pic_person' => $issue->pic_orang_pic, 'stakeholder' => $issue->stakeholder, 'klasifikasi' => $issue->klasifikasi_strategis, 'status' => $issue->status, 'progres' => $issue->progres, 'rincian' => $issue->rincian_kegiatan, 'deskripsi' => $issue->deskripsi_kegiatan, 'hambatan' => $issue->hambatan_kendala, 'dampak' => $issue->dampak, 'goals' => $issue->goals, 'updated' => optional($issue->terakhir_di_update)->format('d M Y H:i'), 'update_note' => $issue->keterangan_update], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP)) }}">Resume</button><a href="{{ route('isu-strategis.edit', $issue) }}" class="edit-button">Edit</a></td>
+                                <td><div class="issue-actions"><button type="button" class="resume-button" data-resume="{{ e(json_encode(['kegiatan' => $issue->kegiatan, 'unit' => $issue->unit_lembaga_pengusul, 'pic_unit' => $issue->pic_orang_unit_lembaga_pengusul, 'pic' => $issue->pic, 'pic_person' => $issue->pic_orang_pic, 'stakeholder' => $issue->stakeholder, 'klasifikasi' => $issue->klasifikasi_strategis, 'status' => $issue->status, 'progres' => $issue->progres, 'rincian' => $issue->rincian_kegiatan, 'deskripsi' => $issue->deskripsi_kegiatan, 'hambatan' => $issue->hambatan_kendala, 'dampak' => $issue->dampak, 'goals' => $issue->goals, 'updated' => optional($issue->terakhir_di_update)->format('d M Y H:i'), 'update_note' => $issue->keterangan_update], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP)) }}">Resume</button><a href="{{ route('isu-strategis.edit', $issue) }}" class="edit-button">Edit</a><form method="POST" action="{{ route('isu-strategis.destroy', $issue) }}" data-confirm-delete data-delete-name="{{ $issue->kegiatan }}">@csrf @method('DELETE')<button type="submit" class="issue-delete-button">Hapus</button></form></div></td>
                             </tr>
                         @empty
                             <tr><td colspan="22" class="empty-state">Belum ada kegiatan yang sedang berjalan.</td></tr>
@@ -345,5 +345,6 @@
             <button type="button" class="resume-modal__footer-close"><span aria-hidden="true">×</span> Tutup Resume</button>
         </div>
     </div>
+    @include('partials.delete-confirm-modal')
 </body>
 </html>

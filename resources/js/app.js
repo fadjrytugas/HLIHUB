@@ -25,6 +25,12 @@ const documentPreviewModal = document.querySelector('#documentPreviewModal');
 const documentPreviewFrame = documentPreviewModal?.querySelector('[data-document-frame]');
 const documentPreviewClose = documentPreviewModal?.querySelector('.document-preview-modal__close');
 const archiveEditModals = document.querySelectorAll('.legal-product-edit-modal');
+const deleteConfirmModal = document.querySelector('#deleteConfirmModal');
+const deleteConfirmName = deleteConfirmModal?.querySelector('[data-delete-confirm-name]');
+const deleteConfirmCancel = deleteConfirmModal?.querySelector('[data-delete-cancel]');
+const deleteConfirmButton = deleteConfirmModal?.querySelector('[data-delete-confirm]');
+let pendingDeleteForm = null;
+let confirmedDeleteForm = null;
 document.querySelectorAll('.legal-product-detail').forEach((details) => {
     const card = details.closest('.legal-product-card');
     const syncExpandedCard = () => card?.classList.toggle('legal-product-card--expanded', details.open);
@@ -258,7 +264,6 @@ document.querySelectorAll('[data-sidebar-submenu]').forEach((button) => {
         button.setAttribute('aria-expanded', String(!expanded));
         submenu.hidden = expanded;
         button.closest('.sidebar-group')?.classList.toggle('sidebar-group--open', !expanded);
-    });
 });
 
 issueSearch?.addEventListener('input', (event) => {
@@ -424,6 +429,64 @@ document.querySelectorAll('form[data-confirm]').forEach((form) => {
         if (!window.confirm(form.dataset.confirm)) {
             event.preventDefault();
         }
+    });
+});
+
+document.querySelectorAll('form[data-confirm-delete]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+        if (form === confirmedDeleteForm) {
+            confirmedDeleteForm = null;
+            return;
+        }
+
+        event.preventDefault();
+        pendingDeleteForm = form;
+        if (deleteConfirmName) {
+            deleteConfirmName.textContent = form.dataset.deleteName || 'ini';
+        }
+        deleteConfirmModal?.classList.remove('delete-confirm-modal--hidden');
+        document.body.classList.add('modal-open');
+        deleteConfirmCancel?.focus();
+    });
+});
+
+const closeDeleteConfirmModal = () => {
+    deleteConfirmModal?.classList.add('delete-confirm-modal--hidden');
+    pendingDeleteForm = null;
+    document.body.classList.remove('modal-open');
+};
+
+deleteConfirmCancel?.addEventListener('click', closeDeleteConfirmModal);
+deleteConfirmButton?.addEventListener('click', () => {
+    if (pendingDeleteForm) {
+        const form = pendingDeleteForm;
+        pendingDeleteForm = null;
+        confirmedDeleteForm = form;
+        closeDeleteConfirmModal();
+        form.requestSubmit();
+    }
+});
+deleteConfirmModal?.addEventListener('click', (event) => {
+    if (event.target === deleteConfirmModal) {
+        closeDeleteConfirmModal();
+    }
+});
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && deleteConfirmModal && !deleteConfirmModal.classList.contains('delete-confirm-modal--hidden')) {
+        closeDeleteConfirmModal();
+    }
+    if (event.key === 'Tab' && deleteConfirmModal && !deleteConfirmModal.classList.contains('delete-confirm-modal--hidden')) {
+        const buttons = [deleteConfirmCancel, deleteConfirmButton].filter(Boolean);
+        const firstButton = buttons[0];
+        const lastButton = buttons[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === firstButton) {
+            event.preventDefault();
+            lastButton?.focus();
+        } else if (!event.shiftKey && document.activeElement === lastButton) {
+            event.preventDefault();
+            firstButton?.focus();
+        }
+    }
     });
 });
 

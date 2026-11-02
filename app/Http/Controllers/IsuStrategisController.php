@@ -65,6 +65,16 @@ class IsuStrategisController extends Controller
         return redirect('/')->with('success', 'Data berhasil diperbarui.');
     }
 
+    public function destroy(IsuStrategis $isuStrategi): RedirectResponse
+    {
+        DB::transaction(function () use ($isuStrategi): void {
+            $isuStrategi->tracking()->delete();
+            $isuStrategi->delete();
+        });
+
+        return redirect('/')->with('success', 'Data kegiatan berhasil dihapus.');
+    }
+
     private function validatedData(Request $request, bool $creating = false): array
     {
         $rules = [
