@@ -264,6 +264,7 @@ document.querySelectorAll('[data-sidebar-submenu]').forEach((button) => {
         button.setAttribute('aria-expanded', String(!expanded));
         submenu.hidden = expanded;
         button.closest('.sidebar-group')?.classList.toggle('sidebar-group--open', !expanded);
+    });
 });
 
 issueSearch?.addEventListener('input', (event) => {
@@ -487,7 +488,6 @@ document.addEventListener('keydown', (event) => {
             firstButton?.focus();
         }
     }
-    });
 });
 
 const closeTrackingModal = (modal) => {
