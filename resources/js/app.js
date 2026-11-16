@@ -25,6 +25,63 @@ const documentPreviewModal = document.querySelector('#documentPreviewModal');
 const documentPreviewFrame = documentPreviewModal?.querySelector('[data-document-frame]');
 const documentPreviewClose = documentPreviewModal?.querySelector('.document-preview-modal__close');
 const archiveEditModals = document.querySelectorAll('.legal-product-edit-modal');
+document.querySelectorAll('form.legal-product-form').forEach((form) => {
+    const startDate = form.querySelector('input[name="tanggal_mulai"]');
+    const endDate = form.querySelector('input[name="tanggal_berakhir"]');
+    const durationField = form.querySelector('input[name="jangka_waktu"]');
+
+    if (!startDate || !endDate || !durationField) {
+        return;
+    }
+
+    const updateDuration = () => {
+        if (!startDate.value || !endDate.value || endDate.value < startDate.value) {
+            durationField.value = '';
+
+            return;
+        }
+
+        const [startYear, startMonth, startDay] = startDate.value.split('-').map(Number);
+        const [endYear, endMonth, endDay] = endDate.value.split('-').map(Number);
+        const start = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+        const end = new Date(Date.UTC(endYear, endMonth - 1, endDay));
+        const addMonths = (date, months) => {
+            const monthIndex = date.getUTCMonth() + months;
+            const year = date.getUTCFullYear() + Math.floor(monthIndex / 12);
+            const month = ((monthIndex % 12) + 12) % 12;
+            const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+
+            return new Date(Date.UTC(year, month, Math.min(date.getUTCDate(), lastDay)));
+        };
+        let years = endYear - startYear;
+        let anchor = addMonths(start, years * 12);
+
+        if (anchor > end) {
+            years -= 1;
+            anchor = addMonths(start, years * 12);
+        }
+
+        let months = (end.getUTCFullYear() - anchor.getUTCFullYear()) * 12
+            + end.getUTCMonth() - anchor.getUTCMonth();
+        anchor = addMonths(anchor, months);
+
+        if (anchor > end) {
+            months -= 1;
+            anchor = addMonths(anchor, months);
+        }
+
+        const days = Math.round((end - anchor) / 86400000);
+        const parts = [];
+        if (years > 0) parts.push(`${years} tahun`);
+        if (months > 0) parts.push(`${months} bulan`);
+        if (days > 0) parts.push(`${days} hari`);
+        durationField.value = parts.length > 0 ? parts.join(' ') : 'Kurang dari 1 hari';
+    };
+
+    startDate.addEventListener('input', updateDuration);
+    endDate.addEventListener('input', updateDuration);
+    updateDuration();
+});
 const deleteConfirmModal = document.querySelector('#deleteConfirmModal');
 const deleteConfirmName = deleteConfirmModal?.querySelector('[data-delete-confirm-name]');
 const deleteConfirmCancel = deleteConfirmModal?.querySelector('[data-delete-cancel]');

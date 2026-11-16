@@ -58,7 +58,7 @@
                     <input type="date" name="tanggal_berakhir" value="{{ old('tanggal_berakhir') }}" required>
                 </label>
                 <label class="legal-field">Jangka Waktu
-                    <input type="text" name="jangka_waktu" value="{{ old('jangka_waktu') }}" maxlength="100" placeholder="Contoh: 2 tahun" required>
+                    <input type="text" name="jangka_waktu" value="{{ old('jangka_waktu') }}" maxlength="100" placeholder="Terisi otomatis dari tanggal" readonly>
                 </label>
                 <label class="legal-field legal-field--wide">Ruang Lingkup {{ $title }}
                     <textarea name="ruang_lingkup" rows="3" maxlength="10000" required>{{ old('ruang_lingkup') }}</textarea>
@@ -250,7 +250,7 @@
                                 <input type="date" name="tanggal_berakhir" value="{{ old('tanggal_berakhir', $archive->tanggal_berakhir->format('Y-m-d')) }}" required>
                             </label>
                             <label class="legal-field">Jangka Waktu
-                                <input type="text" name="jangka_waktu" value="{{ old('jangka_waktu', $archive->jangka_waktu) }}" maxlength="100" placeholder="Contoh: 2 tahun" required>
+                                <input type="text" name="jangka_waktu" value="{{ old('jangka_waktu', $archive->jangka_waktu) }}" maxlength="100" placeholder="Terisi otomatis dari tanggal" readonly>
                             </label>
                             <label class="legal-field legal-field--wide">Ruang Lingkup {{ $title }}
                                 <textarea name="ruang_lingkup" rows="3" maxlength="10000" required>{{ old('ruang_lingkup', $archive->ruang_lingkup) }}</textarea>

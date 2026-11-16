@@ -28,8 +28,8 @@ class LegalProductArchiveTest extends TestCase
         $this->post(route('legal-products.store', 'pks'), [
             'nama_dokumen' => 'PKS Kerja Sama Pengujian',
             'tanggal_mulai' => '2026-01-01',
-            'tanggal_berakhir' => '2027-01-01',
-            'jangka_waktu' => '1 tahun',
+            'tanggal_berakhir' => '2027-01-03',
+            'jangka_waktu' => '99 tahun',
             'stakeholder' => 'Kementerian Pengujian',
             'unit_pelaksana' => 'Direktorat Kerja Sama',
             'ruang_lingkup' => 'Pengembangan sistem dan pertukaran data.',
@@ -47,7 +47,7 @@ class LegalProductArchiveTest extends TestCase
 
         $this->assertSame('pks', $archive->type);
         $this->assertSame('pks-pengujian.pdf', $archive->document_original_name);
-        $this->assertSame('1 tahun', $archive->jangka_waktu);
+        $this->assertSame('1 tahun 2 hari', $archive->jangka_waktu);
         Storage::disk('local')->assertExists($archive->document_path);
 
         $this->get(route('legal-products.download', ['pks', $archive]))

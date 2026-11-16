@@ -53,13 +53,21 @@ class IsuStrategisPicTest extends TestCase
 
     public function test_tracking_page_search_shows_only_matching_issues(): void
     {
-        IsuStrategis::query()->create(['kegiatan' => 'Kegiatan Cocok Uji Pencarian']);
+        IsuStrategis::query()->create([
+            'kegiatan' => 'Kegiatan Cocok Uji Pencarian',
+            'tanggal_masuk' => '2026-10-16',
+            'deadline' => '2026-10-30',
+        ]);
         IsuStrategis::query()->create(['kegiatan' => 'Kegiatan Lain Uji Pencarian']);
 
         $this->withSession(['dashboard_authenticated' => true])
             ->get(route('isu-strategis.data', ['q' => 'Kegiatan Cocok Uji']))
             ->assertOk()
             ->assertSee('Kegiatan Cocok Uji Pencarian')
+            ->assertSee('TANGGAL MASUK')
+            ->assertSee('DEADLINE')
+            ->assertSee('16 Oct 2026')
+            ->assertSee('30 Oct 2026')
             ->assertDontSee('Kegiatan Lain Uji Pencarian')
             ->assertSee('name="q" type="search" value="Kegiatan Cocok Uji"', false);
 

@@ -71,6 +71,7 @@ class LegalProductArchiveController extends Controller
 
         LegalProductArchive::query()->create([
             ...$data,
+            'jangka_waktu' => null,
             'type' => $type,
             'document_path' => $file->store('produk-hukum/'.$type),
             'document_original_name' => $file->getClientOriginalName(),
@@ -85,6 +86,7 @@ class LegalProductArchiveController extends Controller
     {
         $this->ensureArchiveInType($type, $archive);
         $data = $request->validate($this->rules(false));
+        $data['jangka_waktu'] = null;
         $oldDocumentPath = $archive->document_path;
 
         $archive->fill($data);
@@ -145,7 +147,6 @@ class LegalProductArchiveController extends Controller
             'nama_dokumen' => ['required', 'string', 'max:255'],
             'tanggal_mulai' => ['required', 'date'],
             'tanggal_berakhir' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
-            'jangka_waktu' => ['required', 'string', 'max:100'],
             'stakeholder' => ['required', 'string', 'max:255'],
             'unit_pelaksana' => ['required', 'string', 'max:255'],
             'ruang_lingkup' => ['required', 'string', 'max:10000'],

@@ -167,7 +167,7 @@
                     };
                 @endphp
                 <table id="issuesTable">
-                    <thead><tr><th>NO</th><th>UNIT/LEMBAGA PENGUSUL</th><th>PIC PENGUSUL</th><th>STAKEHOLDER</th><th>KLASIFIKASI STRATEGIS</th><th>KEGIATAN</th><th>DESKRIPSI KEGIATAN</th><th>RINCIAN KEGIATAN</th><th>GOALS</th><th>PROGRES</th><th>STATUS</th><th>PIC</th><th>PIC HHI/HLI</th><th>SLA</th><th>SLA HARI KERJA</th><th>DURASI AKTUAL</th><th>HAMBATAN/KENDALA</th><th>DAMPAK</th><th>TERAKHIR DI UPDATE</th><th>KETERANGAN UPDATE</th><th>AKSI</th></tr></thead>
+                    <thead><tr><th>NO</th><th>UNIT/LEMBAGA PENGUSUL</th><th>PIC PENGUSUL</th><th>STAKEHOLDER</th><th>KLASIFIKASI STRATEGIS</th><th>KEGIATAN</th><th>TANGGAL MASUK</th><th>DEADLINE</th><th>DESKRIPSI KEGIATAN</th><th>RINCIAN KEGIATAN</th><th>GOALS</th><th>PROGRES</th><th>STATUS</th><th>PIC</th><th>PIC HHI/HLI</th><th>SLA</th><th>SLA HARI KERJA</th><th>DURASI AKTUAL</th><th>HAMBATAN/KENDALA</th><th>DAMPAK</th><th>TERAKHIR DI UPDATE</th><th>KETERANGAN UPDATE</th><th>AKSI</th></tr></thead>
                     <tbody>
                         @forelse ($issues as $issue)
                             @php
@@ -182,6 +182,8 @@
                                 <td>{{ $issue->stakeholder ?: '-' }}</td>
                                 <td>{{ $issue->klasifikasi_strategis ?: '-' }}</td>
                                 <td><strong>{{ $issue->kegiatan }}</strong></td>
+                                <td>{{ optional($issue->tanggal_masuk)->format('d M Y') ?: '-' }}</td>
+                                <td>{{ optional($issue->deadline)->format('d M Y') ?: '-' }}</td>
                                 <td>{!! $pointList($issue->deskripsi_kegiatan) !!}</td>
                                 <td>{!! $pointList($issue->rincian_kegiatan) !!}</td>
                                 <td>{!! $pointList($issue->goals) !!}</td>
@@ -206,7 +208,7 @@
                                 <td><div class="issue-actions"><button type="button" class="tracking-link tracking-button" data-tracking-open="trackingModal{{ $issue->no }}">Tracking</button><button type="button" class="resume-button" data-resume="{{ e(json_encode(['kegiatan' => $issue->kegiatan, 'unit' => $issue->unit_lembaga_pengusul, 'pic_unit' => $issue->pic_orang_unit_lembaga_pengusul, 'pic' => $issue->pic, 'pic_person' => $issue->pic_orang_pic, 'stakeholder' => $issue->stakeholder, 'klasifikasi' => $issue->klasifikasi_strategis, 'status' => $issue->status, 'progres' => $issue->progres, 'rincian' => $issue->rincian_kegiatan, 'deskripsi' => $issue->deskripsi_kegiatan, 'hambatan' => $issue->hambatan_kendala, 'dampak' => $issue->dampak, 'goals' => $issue->goals, 'updated' => optional($issue->terakhir_di_update)->format('d M Y H:i'), 'update_note' => $issue->keterangan_update], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP)) }}">Resume</button><a href="{{ route('isu-strategis.edit', $issue) }}" class="edit-button">Edit</a><form method="POST" action="{{ route('isu-strategis.destroy', $issue) }}" data-confirm-delete data-delete-name="{{ $issue->kegiatan }}">@csrf @method('DELETE')<button type="submit" class="issue-delete-button">Hapus</button></form></div></td>
                             </tr>
                         @empty
-                            <tr><td colspan="21" class="empty-state">{{ $isSearch ? ($legalRegulations->isEmpty() && $legalProductArchives->isEmpty() ? 'Tidak ada kegiatan, produk hukum, peraturan, atau pasal yang cocok.' : 'Tidak ada kegiatan yang cocok; periksa hasil produk hukum di atas.') : ($searchTerm !== '' ? 'Tidak ada kegiatan yang cocok dengan kata kunci ini.' : 'Belum ada data isu strategis.') }}</td></tr>
+                            <tr><td colspan="23" class="empty-state">{{ $isSearch ? ($legalRegulations->isEmpty() && $legalProductArchives->isEmpty() ? 'Tidak ada kegiatan, produk hukum, peraturan, atau pasal yang cocok.' : 'Tidak ada kegiatan yang cocok; periksa hasil produk hukum di atas.') : ($searchTerm !== '' ? 'Tidak ada kegiatan yang cocok dengan kata kunci ini.' : 'Belum ada data isu strategis.') }}</td></tr>
                         @endforelse
                     </tbody>
                 </table>
