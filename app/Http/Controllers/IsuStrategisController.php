@@ -83,6 +83,7 @@ class IsuStrategisController extends Controller
             'stakeholder' => ['required', 'string', 'max:255'],
             'klasifikasi_strategis' => ['required', 'string', 'max:255'],
             'kegiatan' => ['required', 'string'],
+            'is_priority' => ['sometimes', 'boolean'],
             'deskripsi_kegiatan' => ['nullable', 'string'],
             'rincian_kegiatan' => ['nullable', 'string'],
             'goals' => ['nullable', 'string'],

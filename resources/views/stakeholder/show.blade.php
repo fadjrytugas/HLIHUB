@@ -14,7 +14,11 @@
         </a>
         <header class="stakeholder-profile-header">
             <div class="stakeholder-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V7l7-4 7 4v13M9 20v-6h6v6M8 9h.01M12 9h.01M16 9h.01"/></svg>
+                <svg viewBox="0 0 24 24">
+                    <path d="m3 9 9-5 9 5"/>
+                    <path d="M4 10h16M5 10v9m4-9v9m6-9v9m4-9v9"/>
+                    <path d="M3 19h18M2 22h20"/>
+                </svg>
             </div>
             <div class="stakeholder-profile-header__copy">
                 <span class="stakeholder-priority stakeholder-priority--{{ $stakeholder->prioritas === 'TOP PRIORITY' ? 'top' : 'second' }}">{{ $stakeholder->prioritas }}</span>
@@ -126,10 +130,29 @@
                                 <p>{{ $member->jabatan ?: 'Jabatan belum diisi' }}</p>
                                 @if ($member->nama_panggilan)<span>Panggilan: {{ $member->nama_panggilan }}</span>@endif
                             </div>
-                            <span class="stakeholder-member-card__chevron" aria-hidden="true">⌄</span>
                         </div>
-                        <details class="stakeholder-member-details">
-                            <summary>Lihat profil lengkap</summary>
+                        <button class="stakeholder-member-details-trigger" type="button" data-open-member-profile="member-profile-{{ $member->id }}" aria-haspopup="dialog">
+                            Lihat profil lengkap <span aria-hidden="true">↗</span>
+                        </button>
+                        <dialog class="stakeholder-member-profile-modal" id="member-profile-{{ $member->id }}" aria-labelledby="member-profile-title-{{ $member->id }}">
+                            <div class="stakeholder-member-profile-modal__header">
+                                <div class="stakeholder-member-profile-modal__identity">
+                                    <div class="stakeholder-member-avatar stakeholder-member-profile-modal__avatar">
+                                        @if ($member->foto_path)
+                                            <img src="{{ route('stakeholders.members.photo', [$stakeholder, $member]) }}" alt="Foto {{ $member->nama_lengkap }}">
+                                        @else
+                                            <span aria-hidden="true">{{ mb_strtoupper(mb_substr($member->nama_lengkap, 0, 1)) }}</span>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <span class="section-kicker">Profil anggota stakeholder</span>
+                                        <h3 id="member-profile-title-{{ $member->id }}">{{ $member->nama_lengkap }}</h3>
+                                        <p>{{ $member->jabatan ?: 'Jabatan belum diisi' }}</p>
+                                    </div>
+                                </div>
+                                <button class="legal-product-edit-modal__close" type="button" data-close-member-profile aria-label="Tutup profil anggota">&times;</button>
+                            </div>
+                            <div class="stakeholder-member-profile-modal__content">
                             <dl class="stakeholder-member-profile">
                                 <div><dt>Nama Panggilan</dt><dd>{{ $member->nama_panggilan ?: '-' }}</dd></div>
                                 <div><dt>Jenis Kelamin</dt><dd>{{ $member->jenis_kelamin ?: '-' }}</dd></div>
@@ -171,7 +194,8 @@
                                     <button class="legal-danger-button" type="submit">Hapus Anggota</button>
                                 </form>
                             </div>
-                        </details>
+                            </div>
+                        </dialog>
                     </article>
                 @empty
                     <div class="panel stakeholder-empty stakeholder-empty--directory">

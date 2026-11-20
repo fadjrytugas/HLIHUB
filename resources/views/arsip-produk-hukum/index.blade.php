@@ -28,8 +28,8 @@
             </div>
         @endif
 
-        <details class="panel legal-form-panel legal-product-create" @if ($errors->any()) open @endif>
-            <summary class="legal-product-create__summary">
+        <section class="panel legal-form-panel legal-product-create">
+            <div class="legal-product-create__summary">
                 <span class="legal-product-create__intro">
                     <span class="section-kicker">Kelola dokumen</span>
                     <strong>Tambah Arsip {{ $title }}</strong>
@@ -37,9 +37,18 @@
                 </span>
                 <span class="legal-product-create__actions">
                     <span class="legal-count">{{ $archives->total() }} dokumen</span>
-                    <span class="legal-product-create__toggle"><i aria-hidden="true">+</i><span>Tambah arsip</span></span>
+                    <button class="legal-product-create__toggle" type="button" data-open-archive-create="archive-create-modal" aria-haspopup="dialog"><i aria-hidden="true">+</i><span>Tambah arsip</span></button>
                 </span>
-            </summary>
+            </div>
+            <dialog class="legal-product-create-modal" id="archive-create-modal" aria-labelledby="archive-create-title" @if ($errors->any() && !old('archive_id')) data-reopen @endif>
+                <div class="legal-product-create-modal__header">
+                    <div>
+                        <span class="section-kicker">Kelola dokumen</span>
+                        <h3 id="archive-create-title">Tambah Arsip {{ $title }}</h3>
+                        <p>Lengkapi informasi, pihak, masa berlaku, dan dokumen.</p>
+                    </div>
+                    <button class="legal-product-edit-modal__close" type="button" data-close-archive-create aria-label="Tutup formulir tambah arsip">&times;</button>
+                </div>
             <form class="legal-regulation-form legal-product-form" method="POST" action="{{ route('legal-products.store', $type) }}" enctype="multipart/form-data">
                 @csrf
                 <label class="legal-field legal-field--wide">Nama {{ $title }}
@@ -91,7 +100,8 @@
                     <option value="{{ $stakeholder }}">
                 @endforeach
             </datalist>
-        </details>
+            </dialog>
+        </section>
 
         <form class="legal-product-toolbar" method="GET" action="{{ route('legal-products.index', $type) }}" role="search">
             <label class="legal-product-search">
@@ -162,8 +172,19 @@
                             <button class="legal-danger-button" type="submit">Hapus Arsip</button>
                         </form>
                     </div>
-                    <details class="legal-product-detail" @if ($errors->any() && old('archive_id') == $archive->id) open @endif>
-                        <summary><span>Lihat detail lengkap</span><span aria-hidden="true">⌄</span></summary>
+                    <button class="legal-product-detail-trigger" type="button" data-open-archive-detail="archive-detail-{{ $archive->id }}" aria-haspopup="dialog">
+                        Lihat detail lengkap <span aria-hidden="true">↗</span>
+                    </button>
+                    <dialog class="legal-product-detail-modal" id="archive-detail-{{ $archive->id }}" aria-labelledby="archive-detail-title-{{ $archive->id }}" @if (($errors->has('tanggal_adendum') || $errors->has('perubahan')) && old('archive_id') == $archive->id) data-reopen @endif>
+                        <div class="legal-product-detail-modal__header">
+                            <div>
+                                <span class="section-kicker">Detail arsip {{ $title }}</span>
+                                <h3 id="archive-detail-title-{{ $archive->id }}">{{ $archive->nama_dokumen }}</h3>
+                                <p>{{ $archive->stakeholder }} · {{ $archive->unit_pelaksana }}</p>
+                            </div>
+                            <button class="legal-product-edit-modal__close" type="button" data-close-archive-detail aria-label="Tutup detail arsip">&times;</button>
+                        </div>
+                        <div class="legal-product-detail-modal__content">
                     <dl class="legal-product-meta">
                         <div><dt>Nama file</dt><dd>{{ $archive->document_original_name }}</dd></div>
                         <div><dt>Stakeholder</dt><dd>{{ $archive->stakeholder }}</dd></div>
@@ -205,7 +226,7 @@
                         @empty
                             <p class="legal-product-addenda__empty">Belum ada adendum yang dicatat.</p>
                         @endforelse
-                        <details class="legal-product-addendum-create" @if ($errors->has('tanggal_adendum') || $errors->has('perubahan')) open @endif>
+                        <details class="legal-product-addendum-create" @if (($errors->has('tanggal_adendum') || $errors->has('perubahan')) && old('archive_id') == $archive->id) open @endif>
                             <summary>+ Catat adendum atau perubahan</summary>
                             <form class="legal-edit-form legal-product-form" method="POST" action="{{ route('legal-products.addenda.store', [$type, $archive]) }}">
                                 @csrf
@@ -220,8 +241,9 @@
                             </form>
                         </details>
                     </section>
-                    </details>
-                    <dialog class="legal-product-edit-modal" id="archive-edit-{{ $archive->id }}" aria-labelledby="archive-edit-title-{{ $archive->id }}" @if ($errors->any() && old('archive_id') == $archive->id) data-reopen @endif>
+                        </div>
+                    </dialog>
+                    <dialog class="legal-product-edit-modal" id="archive-edit-{{ $archive->id }}" aria-labelledby="archive-edit-title-{{ $archive->id }}" @if ($errors->any() && old('archive_id') == $archive->id && !$errors->has('tanggal_adendum') && !$errors->has('perubahan')) data-reopen @endif>
                         <div class="legal-product-edit-modal__header">
                             <div>
                                 <span class="section-kicker">Kelola dokumen</span>

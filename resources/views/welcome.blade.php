@@ -95,16 +95,19 @@
 
         <section class="kpi-grid" aria-label="Ringkasan indikator utama">
             <article class="kpi-card kpi-card--navy">
-                <div class="kpi-icon">⚑</div>
+                <div class="kpi-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h4"/></svg>
+                </div>
                 <div class="kpi-content">
                     <span class="kpi-label">Total Isu Strategis</span>
                     <strong class="kpi-value">{{ $metrics['total'] }}</strong>
                     <span class="kpi-note">Jumlah kegiatan isu strategis yang sedang dipantau.</span>
                 </div>
-                <span class="kpi-trend">0%</span>
             </article>
             <article class="kpi-card kpi-card--green">
-                <div class="kpi-icon">✓</div>
+                <div class="kpi-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg>
+                </div>
                 <div class="kpi-content">
                     <span class="kpi-label">Selesai</span>
                     <strong class="kpi-value">{{ $metrics['done'] }}</strong>
@@ -113,7 +116,9 @@
                 <span class="kpi-trend">{{ number_format($statusPercentages['done'], 1, ',', '.') }}%</span>
             </article>
             <article class="kpi-card kpi-card--orange">
-                <div class="kpi-icon">◷</div>
+                <div class="kpi-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                </div>
                 <div class="kpi-content">
                     <span class="kpi-label">On Progress</span>
                     <strong class="kpi-value">{{ $metrics['progress'] }}</strong>
@@ -122,22 +127,25 @@
                 <span class="kpi-trend">{{ number_format($statusPercentages['progress'], 1, ',', '.') }}%</span>
             </article>
             <article class="kpi-card kpi-card--blue">
-                <div class="kpi-icon">▣</div>
+                <div class="kpi-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5l8-2v18"/><path d="M13 9h6v12"/><path d="M8 7h.01M8 11h.01M8 15h.01"/></svg>
+                </div>
                 <div class="kpi-content">
                     <span class="kpi-label">Unit Pengusul / Lembaga</span>
                     <strong class="kpi-value">{{ $metrics['units'] }}</strong>
                     <span class="kpi-note">Jumlah unit pengusul/lembaga unik.</span>
                 </div>
-                <span class="kpi-trend">0 unit</span>
+                <span class="kpi-trend">{{ $metrics['units'] }} unit</span>
             </article>
             <article class="kpi-card kpi-card--pink">
-                <div class="kpi-icon">♧</div>
+                <div class="kpi-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
                 <div class="kpi-content">
                     <span class="kpi-label">Stakeholder Unik</span>
                     <strong class="kpi-value">{{ $metrics['stakeholders'] }}</strong>
                     <span class="kpi-note">Jumlah stakeholder unik yang terlibat.</span>
                 </div>
-                <span class="kpi-trend">0%</span>
             </article>
         </section>
 
@@ -292,7 +300,12 @@
                                 <td>{{ $issue->pic_orang_unit_lembaga_pengusul ?: '-' }}</td>
                                 <td>{{ $issue->stakeholder ?: '-' }}</td>
                                 <td>{{ $issue->klasifikasi_strategis ?: '-' }}</td>
-                                <td><strong>{{ $issue->kegiatan }}</strong></td>
+                                <td>
+                                    <strong>{{ $issue->kegiatan }}</strong>
+                                    @if ($issue->is_priority)
+                                        <span class="issue-priority-badge">PRIORITAS</span>
+                                    @endif
+                                </td>
                                 <td>{{ optional($issue->tanggal_masuk)->format('d M Y') ?: '-' }}</td>
                                 <td>{{ optional($issue->deadline)->format('d M Y') ?: '-' }}</td>
                                 <td>{!! $pointList($issue->deskripsi_kegiatan) !!}</td>

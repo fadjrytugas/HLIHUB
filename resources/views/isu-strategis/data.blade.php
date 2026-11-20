@@ -176,12 +176,17 @@
                                 $durationExceeded = $currentSla && $issue->durasi_aktual > $currentSla->sla_hari_kerja;
                             @endphp
                             <tr>
-                                <td>{{ $issue->no }}</td>
+                                <td>{{ $issues->firstItem() + $loop->index }}</td>
                                 <td>{{ $issue->unit_lembaga_pengusul ?: '-' }}</td>
                                 <td>{{ $issue->pic_orang_unit_lembaga_pengusul ?: '-' }}</td>
                                 <td>{{ $issue->stakeholder ?: '-' }}</td>
                                 <td>{{ $issue->klasifikasi_strategis ?: '-' }}</td>
-                                <td><strong>{{ $issue->kegiatan }}</strong></td>
+                                <td>
+                                    <strong>{{ $issue->kegiatan }}</strong>
+                                    @if ($issue->is_priority)
+                                        <span class="issue-priority-badge">PRIORITAS</span>
+                                    @endif
+                                </td>
                                 <td>{{ optional($issue->tanggal_masuk)->format('d M Y') ?: '-' }}</td>
                                 <td>{{ optional($issue->deadline)->format('d M Y') ?: '-' }}</td>
                                 <td>{!! $pointList($issue->deskripsi_kegiatan) !!}</td>

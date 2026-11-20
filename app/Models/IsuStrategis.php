@@ -24,6 +24,7 @@ class IsuStrategis extends Model
         'rincian_kegiatan',
         'goals',
         'progres',
+        'is_priority',
         'status',
         'pic',
         'pic_orang_pic',
@@ -40,6 +41,7 @@ class IsuStrategis extends Model
 
     protected $casts = [
         'progres' => 'integer',
+        'is_priority' => 'boolean',
         'sla_hari_kerja' => 'integer',
         'durasi_aktual' => 'integer',
         'terakhir_di_update' => 'datetime',

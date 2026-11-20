@@ -25,6 +25,9 @@ const documentPreviewModal = document.querySelector('#documentPreviewModal');
 const documentPreviewFrame = documentPreviewModal?.querySelector('[data-document-frame]');
 const documentPreviewClose = documentPreviewModal?.querySelector('.document-preview-modal__close');
 const archiveEditModals = document.querySelectorAll('.legal-product-edit-modal');
+const archiveDetailModals = document.querySelectorAll('.legal-product-detail-modal');
+const archiveCreateModal = document.querySelector('.legal-product-create-modal');
+const stakeholderMemberProfileModals = document.querySelectorAll('.stakeholder-member-profile-modal');
 document.querySelectorAll('form.legal-product-form').forEach((form) => {
     const startDate = form.querySelector('input[name="tanggal_mulai"]');
     const endDate = form.querySelector('input[name="tanggal_berakhir"]');
@@ -88,13 +91,6 @@ const deleteConfirmCancel = deleteConfirmModal?.querySelector('[data-delete-canc
 const deleteConfirmButton = deleteConfirmModal?.querySelector('[data-delete-confirm]');
 let pendingDeleteForm = null;
 let confirmedDeleteForm = null;
-document.querySelectorAll('.legal-product-detail').forEach((details) => {
-    const card = details.closest('.legal-product-card');
-    const syncExpandedCard = () => card?.classList.toggle('legal-product-card--expanded', details.open);
-
-    syncExpandedCard();
-    details.addEventListener('toggle', syncExpandedCard);
-});
 const loginTrigger = document.querySelector('#loginTrigger');
 const loginPanel = document.querySelector('#loginPanel');
 const loginLanding = loginTrigger?.closest('.login-landing');
@@ -400,6 +396,81 @@ archiveEditModals.forEach((modal) => {
         modal.showModal();
         document.body.classList.add('modal-open');
     }
+});
+
+document.querySelectorAll('[data-open-archive-detail]').forEach((button) => {
+    button.addEventListener('click', () => {
+        const modal = document.getElementById(button.dataset.openArchiveDetail);
+        if (!(modal instanceof HTMLDialogElement)) {
+            return;
+        }
+
+        modal.showModal();
+        document.body.classList.add('modal-open');
+    });
+});
+
+archiveDetailModals.forEach((modal) => {
+    modal.querySelector('[data-close-archive-detail]')?.addEventListener('click', () => modal.close());
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.close();
+        }
+    });
+    modal.addEventListener('close', () => document.body.classList.remove('modal-open'));
+
+    if (modal.hasAttribute('data-reopen')) {
+        modal.showModal();
+        document.body.classList.add('modal-open');
+    }
+});
+
+document.querySelectorAll('[data-open-archive-create]').forEach((button) => {
+    button.addEventListener('click', () => {
+        if (!(archiveCreateModal instanceof HTMLDialogElement)) {
+            return;
+        }
+
+        archiveCreateModal.showModal();
+        document.body.classList.add('modal-open');
+    });
+});
+
+if (archiveCreateModal instanceof HTMLDialogElement) {
+    archiveCreateModal.querySelector('[data-close-archive-create]')?.addEventListener('click', () => archiveCreateModal.close());
+    archiveCreateModal.addEventListener('click', (event) => {
+        if (event.target === archiveCreateModal) {
+            archiveCreateModal.close();
+        }
+    });
+    archiveCreateModal.addEventListener('close', () => document.body.classList.remove('modal-open'));
+
+    if (archiveCreateModal.hasAttribute('data-reopen')) {
+        archiveCreateModal.showModal();
+        document.body.classList.add('modal-open');
+    }
+}
+
+document.querySelectorAll('[data-open-member-profile]').forEach((button) => {
+    button.addEventListener('click', () => {
+        const modal = document.getElementById(button.dataset.openMemberProfile);
+        if (!(modal instanceof HTMLDialogElement)) {
+            return;
+        }
+
+        modal.showModal();
+        document.body.classList.add('modal-open');
+    });
+});
+
+stakeholderMemberProfileModals.forEach((modal) => {
+    modal.querySelector('[data-close-member-profile]')?.addEventListener('click', () => modal.close());
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.close();
+        }
+    });
+    modal.addEventListener('close', () => document.body.classList.remove('modal-open'));
 });
 
 const closeDocumentPreview = () => {

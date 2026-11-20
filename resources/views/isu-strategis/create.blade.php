@@ -50,6 +50,20 @@
                             @endif
                         </label>
                     @endforeach
+                    <fieldset class="priority-choice form-field--wide">
+                        <legend>Prioritas Penanganan</legend>
+                        <div class="priority-choice__options">
+                            <label class="priority-choice__option">
+                                <input type="radio" name="is_priority" value="0" @checked((string) old('is_priority', $issue?->is_priority ? '1' : '0') === '0')>
+                                <span><strong>Normal</strong><small>Ditangani sesuai antrean kegiatan.</small></span>
+                            </label>
+                            <label class="priority-choice__option">
+                                <input type="radio" name="is_priority" value="1" @checked((string) old('is_priority', $issue?->is_priority ? '1' : '0') === '1')>
+                                <span><strong>Prioritas</strong><small>Perlu segera ditindaklanjuti.</small></span>
+                            </label>
+                        </div>
+                        <small>Isu prioritas akan ditampilkan lebih dahulu pada daftar prioritas.</small>
+                    </fieldset>
                     <label class="form-field"><span>Progres (%) <b>*</b></span><input type="number" name="progres" value="{{ old('progres', $issue?->progres ?? 0) }}" min="0" max="100" step="1" required><small>Isi progres kegiatan secara manual dari 0 sampai 100%.</small></label>
                     @if ($issue)
                         <label class="form-field"><span>Status</span><input type="text" value="{{ $issue->status }}" readonly><small>Status menjadi SELESAI saat SLA yang sedang dikerjakan diselesaikan; progres tetap mengikuti isian manual.</small></label>

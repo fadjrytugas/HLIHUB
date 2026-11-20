@@ -27,6 +27,11 @@ class DashboardController extends Controller
         $priorityIssues = $issues
             ->filter(fn (IsuStrategis $issue): bool => $this->isProgress($issue->status))
             ->sort(function (IsuStrategis $left, IsuStrategis $right): int {
+                $priorityOrder = (int) $right->is_priority <=> (int) $left->is_priority;
+                if ($priorityOrder !== 0) {
+                    return $priorityOrder;
+                }
+
                 $leftDeadline = $left->deadline?->timestamp ?? PHP_INT_MAX;
                 $rightDeadline = $right->deadline?->timestamp ?? PHP_INT_MAX;
 

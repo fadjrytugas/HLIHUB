@@ -151,4 +151,47 @@ class IsuStrategisPicTest extends TestCase
         $this->assertDatabaseMissing('isu_strategis', ['no' => $issue->no]);
         $this->assertDatabaseMissing('isu_strategis_trackings', ['id' => $tracking->id]);
     }
+
+    public function test_new_priority_issue_is_saved_and_shown_first_with_a_label(): void
+    {
+        $stage = TrackingSlaStage::query()->firstOrFail();
+        $this->get(route('isu-strategis.create'))
+            ->assertOk()
+            ->assertSee('name="is_priority"', false)
+            ->assertSee('Perlu segera ditindaklanjuti');
+
+        IsuStrategis::query()->create([
+            'kegiatan' => 'Kegiatan Reguler Sebelum Prioritas',
+            'status' => 'ON PROGRESS',
+            'deadline' => '2026-10-20',
+        ]);
+
+        $this->post(route('isu-strategis.store'), [
+            'unit_lembaga_pengusul' => 'Unit Prioritas',
+            'stakeholder' => 'Stakeholder Prioritas',
+            'klasifikasi_strategis' => 'Klasifikasi Prioritas',
+            'kegiatan' => 'Kegiatan Uji Prioritas Baru',
+            'progres' => 0,
+            'tanggal_masuk' => '2026-10-16',
+            'deadline' => '2026-10-30',
+            'sla_stage' => $stage->tahap_ke,
+            'is_priority' => '1',
+        ])->assertRedirect('/');
+
+        $priorityIssue = IsuStrategis::query()
+            ->where('kegiatan', 'Kegiatan Uji Prioritas Baru')
+            ->firstOrFail();
+        $this->assertTrue($priorityIssue->is_priority);
+
+        $this->get('/')
+            ->assertViewHas('priorityIssues', fn ($issues): bool => $issues->first()?->no === $priorityIssue->no)
+            ->assertSee('class="issue-priority-badge">PRIORITAS', false)
+            ->assertSee('Kegiatan Uji Prioritas Baru');
+
+        $this->withSession(['dashboard_authenticated' => true])
+            ->get(route('isu-strategis.data', ['q' => 'Kegiatan Uji Prioritas Baru']))
+            ->assertOk()
+            ->assertSee('class="issue-priority-badge">PRIORITAS', false)
+            ->assertSee('Kegiatan Uji Prioritas Baru');
+    }
 }
