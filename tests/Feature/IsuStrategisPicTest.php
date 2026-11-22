@@ -80,6 +80,57 @@ class IsuStrategisPicTest extends TestCase
                 && $issues->currentPage() === 1);
     }
 
+    public function test_tracking_page_filters_by_pic_status_and_priority_together(): void
+    {
+        IsuStrategis::query()->create([
+            'kegiatan' => 'Kegiatan Filter HLS Prioritas',
+            'pic' => 'HLS',
+            'status' => 'ON PROGRESS',
+            'is_priority' => true,
+        ]);
+        IsuStrategis::query()->create([
+            'kegiatan' => 'Kegiatan Filter HLS Selesai',
+            'pic' => 'HLS',
+            'status' => 'SELESAI',
+            'is_priority' => true,
+        ]);
+        IsuStrategis::query()->create([
+            'kegiatan' => 'Kegiatan Filter Lain',
+            'pic' => 'HLI',
+            'status' => 'ON PROGRESS',
+            'is_priority' => true,
+        ]);
+        IsuStrategis::query()->create([
+            'kegiatan' => 'Kegiatan Filter HLS Pending',
+            'pic' => 'HLS',
+            'status' => 'PENDING',
+            'is_priority' => false,
+        ]);
+
+        $this->withSession(['dashboard_authenticated' => true])
+            ->get(route('isu-strategis.data', [
+                'pic' => 'HLS',
+                'status' => 'progress',
+                'priority' => 'priority',
+            ]))
+            ->assertOk()
+            ->assertSee('Kegiatan Filter HLS Prioritas')
+            ->assertDontSee('Kegiatan Filter HLS Selesai')
+            ->assertDontSee('Kegiatan Filter Lain')
+            ->assertDontSee('Kegiatan Filter HLS Pending')
+            ->assertSee('value="HLS" selected', false)
+            ->assertSee('value="progress" selected', false)
+            ->assertSee('value="priority" selected', false);
+
+        $this->withSession(['dashboard_authenticated' => true])
+            ->get(route('isu-strategis.data', ['status' => 'pending']))
+            ->assertOk()
+            ->assertSee('Kegiatan Filter HLS Pending')
+            ->assertDontSee('Kegiatan Filter HLS Prioritas')
+            ->assertDontSee('Kegiatan Filter HLS Selesai')
+            ->assertDontSee('Kegiatan Filter Lain');
+    }
+
     public function test_issue_update_saves_and_displays_the_latest_update_note(): void
     {
         $issue = IsuStrategis::query()->create([

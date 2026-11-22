@@ -205,40 +205,79 @@ class DashboardController extends Controller
     public function data(Request $request): View
     {
         $searchTerm = trim((string) $request->query('q', ''));
+        $filters = $request->validate([
+            'pic' => ['nullable', 'string', 'max:255'],
+            'status' => ['nullable', 'in:progress,done,pending'],
+            'priority' => ['nullable', 'in:priority,non_priority'],
+        ]);
+        $selectedPic = trim((string) ($filters['pic'] ?? ''));
+        $selectedStatus = $filters['status'] ?? '';
+        $selectedPriority = $filters['priority'] ?? '';
+
+        $issues = IsuStrategis::query()
+            ->with('tracking')
+            ->when($searchTerm !== '', function ($query) use ($searchTerm): void {
+                $query->where(function ($query) use ($searchTerm): void {
+                    foreach ([
+                        'no',
+                        'unit_lembaga_pengusul',
+                        'pic_orang_unit_lembaga_pengusul',
+                        'stakeholder',
+                        'klasifikasi_strategis',
+                        'kegiatan',
+                        'deskripsi_kegiatan',
+                        'rincian_kegiatan',
+                        'goals',
+                        'progres',
+                        'status',
+                        'pic',
+                        'pic_orang_pic',
+                        'sla',
+                        'keterangan_update',
+                        'hambatan_kendala',
+                        'dampak',
+                    ] as $field) {
+                        $query->orWhere($field, 'like', '%'.$searchTerm.'%');
+                    }
+                });
+            })
+            ->when($selectedPic !== '', fn ($query) => $query->whereRaw('TRIM(pic) = ?', [$selectedPic]))
+            ->when($selectedStatus === 'progress', fn ($query) => $query->whereRaw(
+                "UPPER(COALESCE(status, '')) IN (?, ?, ?)",
+                ['ON PROGRESS', 'PROGRESS', 'IN PROGRESS'],
+            ))
+            ->when($selectedStatus === 'done', fn ($query) => $query->whereRaw(
+                "UPPER(COALESCE(status, '')) IN (?, ?, ?)",
+                ['DONE', 'SELESAI', 'COMPLETED'],
+            ))
+            ->when($selectedStatus === 'pending', fn ($query) => $query->whereRaw(
+                "UPPER(COALESCE(status, '')) NOT IN (?, ?, ?, ?, ?, ?)",
+                ['DONE', 'SELESAI', 'COMPLETED', 'ON PROGRESS', 'PROGRESS', 'IN PROGRESS'],
+            ))
+            ->when($selectedPriority !== '', fn ($query) => $query->where(
+                'is_priority',
+                $selectedPriority === 'priority',
+            ))
+            ->orderBy('no')
+            ->paginate(10)
+            ->withQueryString();
+
         return view('isu-strategis.data', [
-            'issues' => IsuStrategis::query()
-                ->with('tracking')
-                ->when($searchTerm !== '', function ($query) use ($searchTerm): void {
-                    $query->where(function ($query) use ($searchTerm): void {
-                        foreach ([
-                            'no',
-                            'unit_lembaga_pengusul',
-                            'pic_orang_unit_lembaga_pengusul',
-                            'stakeholder',
-                            'klasifikasi_strategis',
-                            'kegiatan',
-                            'deskripsi_kegiatan',
-                            'rincian_kegiatan',
-                            'goals',
-                            'progres',
-                            'status',
-                            'pic',
-                            'pic_orang_pic',
-                            'sla',
-                            'keterangan_update',
-                            'hambatan_kendala',
-                            'dampak',
-                        ] as $field) {
-                            $query->orWhere($field, 'like', '%'.$searchTerm.'%');
-                        }
-                    });
-                })
-                ->orderBy('no')
-                ->paginate(10)
-                ->withQueryString(),
+            'issues' => $issues,
             'slaOptions' => \App\Models\TrackingSlaStage::query()->orderBy('nama_tahap')->get(),
             'isSearch' => false,
             'searchTerm' => $searchTerm,
+            'picOptions' => IsuStrategis::query()
+                ->whereNotNull('pic')
+                ->pluck('pic')
+                ->map(fn (?string $pic): string => trim((string) $pic))
+                ->filter()
+                ->unique()
+                ->sort()
+                ->values(),
+            'selectedPic' => $selectedPic,
+            'selectedStatus' => $selectedStatus,
+            'selectedPriority' => $selectedPriority,
         ]);
     }
 

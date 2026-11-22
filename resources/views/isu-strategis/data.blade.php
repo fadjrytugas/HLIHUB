@@ -138,10 +138,41 @@
             <div class="panel-heading issues-heading">
                 <div><span class="section-kicker">Daftar data</span><h2>{{ $isSearch ? 'Data yang Ditemukan' : ($searchTerm !== '' ? 'Hasil Pencarian' : 'Seluruh Isu Strategis') }}</h2></div>
                 @if (! $isSearch)
-                    <form class="search-box" action="{{ route('isu-strategis.data') }}" method="GET">
-                        <span aria-hidden="true">⌕</span>
-                        <input id="issueSearch" name="q" type="search" value="{{ $searchTerm }}" placeholder="Cari isu..." aria-label="Cari isu">
+                    <form class="issue-filters" action="{{ route('isu-strategis.data') }}" method="GET">
+                        <label class="issue-filter">
+                            <span>PIC</span>
+                            <select name="pic" aria-label="Filter berdasarkan PIC">
+                                <option value="">Semua PIC</option>
+                                @foreach ($picOptions as $picOption)
+                                    <option value="{{ $picOption }}" @selected($selectedPic === $picOption)>{{ $picOption }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                        <label class="issue-filter">
+                            <span>Status</span>
+                            <select name="status" aria-label="Filter berdasarkan status">
+                                <option value="">Semua status</option>
+                                <option value="progress" @selected($selectedStatus === 'progress')>On Progress</option>
+                                <option value="done" @selected($selectedStatus === 'done')>Selesai</option>
+                                <option value="pending" @selected($selectedStatus === 'pending')>Pending</option>
+                            </select>
+                        </label>
+                        <label class="issue-filter">
+                            <span>Prioritas</span>
+                            <select name="priority" aria-label="Filter berdasarkan prioritas">
+                                <option value="">Semua</option>
+                                <option value="priority" @selected($selectedPriority === 'priority')>Prioritas</option>
+                                <option value="non_priority" @selected($selectedPriority === 'non_priority')>Bukan prioritas</option>
+                            </select>
+                        </label>
+                        <label class="search-box">
+                            <span aria-hidden="true">⌕</span>
+                            <input id="issueSearch" name="q" type="search" value="{{ $searchTerm }}" placeholder="Cari isu..." aria-label="Cari isu">
+                        </label>
                         <button class="search-submit" type="submit">Cari</button>
+                        @if ($selectedPic !== '' || $selectedStatus !== '' || $selectedPriority !== '' || $searchTerm !== '')
+                            <a class="issue-filter-reset" href="{{ route('isu-strategis.data') }}">Reset</a>
+                        @endif
                     </form>
                 @endif
             </div>
