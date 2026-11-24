@@ -139,7 +139,29 @@ class StakeholderController extends Controller
             ],
             'prioritas' => ['required', Rule::in(['TOP PRIORITY', '2ND PRIORITY'])],
             'fungsi_instansi' => ['nullable', 'string'],
-            'website_resmi' => ['nullable', 'url', 'max:255'],
+            'website_resmi' => [
+                'nullable',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail): void {
+                    if (! is_string($value) || trim($value) === '') {
+                        return;
+                    }
+
+                    preg_match_all('/https?:\/\/[^\s&]+/i', $value, $matches);
+                    if ($matches[0] === []) {
+                        $fail('Cantumkan minimal satu URL yang diawali http:// atau https://.');
+                        return;
+                    }
+
+                    foreach ($matches[0] as $url) {
+                        if (filter_var(rtrim($url, '.,;'), FILTER_VALIDATE_URL) === false) {
+                            $fail('Setiap tautan website harus berupa URL yang valid. Pisahkan beberapa tautan dengan & atau baris baru.');
+                            return;
+                        }
+                    }
+                },
+            ],
             'struktur_organisasi' => ['nullable', 'string'],
             'alamat_kantor' => ['nullable', 'string'],
             'telepon' => ['nullable', 'string', 'max:100'],

@@ -38,6 +38,12 @@
                         <h2>Informasi Stakeholder</h2>
                         <button class="stakeholder-create__close" type="button" aria-label="Tutup formulir">&times;</button>
                     </div>
+                    @if ($errors->any())
+                        <div class="legal-alert legal-alert--error" role="alert">
+                            <strong>Stakeholder belum tersimpan. Periksa data berikut:</strong>
+                            <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+                        </div>
+                    @endif
                     <div class="stakeholder-form-grid">
                         <label class="legal-field">Nama Stakeholder / Instansi <b>*</b>
                             <input type="text" name="nama" value="{{ old('nama') }}" maxlength="255" required>
@@ -52,7 +58,8 @@
                             <textarea name="fungsi_instansi" rows="3">{{ old('fungsi_instansi') }}</textarea>
                         </label>
                         <label class="legal-field">Website Resmi
-                            <input type="url" name="website_resmi" value="{{ old('website_resmi') }}" placeholder="https://">
+                            <input type="text" name="website_resmi" value="{{ old('website_resmi') }}" maxlength="255" placeholder="https://contoh.go.id & https://contoh-lain.go.id">
+                            <small>Masukkan satu atau beberapa URL, pisahkan dengan &amp; atau baris baru.</small>
                         </label>
                         <label class="legal-field">Struktur Organisasi
                             <textarea name="struktur_organisasi" rows="3">{{ old('struktur_organisasi') }}</textarea>

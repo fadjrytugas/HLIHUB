@@ -45,7 +45,8 @@
                             <textarea name="fungsi_instansi" rows="3">{{ $stakeholder->fungsi_instansi }}</textarea>
                         </label>
                         <label class="legal-field">Website Resmi
-                            <input type="url" name="website_resmi" value="{{ $stakeholder->website_resmi }}" placeholder="https://">
+                            <input type="text" name="website_resmi" value="{{ $stakeholder->website_resmi }}" maxlength="255" placeholder="https://contoh.go.id & https://contoh-lain.go.id">
+                            <small>Masukkan satu atau beberapa URL, pisahkan dengan &amp; atau baris baru.</small>
                         </label>
                         <label class="legal-field">Struktur Organisasi
                             <textarea name="struktur_organisasi" rows="3">{{ $stakeholder->struktur_organisasi }}</textarea>
@@ -85,9 +86,19 @@
 
         <section class="panel stakeholder-info-panel">
             <div class="panel-heading"><div><span class="section-kicker">Profil institusi</span><h2>Informasi Stakeholder</h2></div></div>
+            @php
+                $websiteLinks = [];
+                preg_match_all('/(?:^|[&\r\n])\s*([^&\r\n]*?)\s*(https?:\/\/[^\s&]+)/i', $stakeholder->website_resmi ?? '', $websiteLinks, PREG_SET_ORDER);
+            @endphp
             <dl class="stakeholder-info-grid">
                 <div><dt>Fungsi Instansi</dt><dd>{{ $stakeholder->fungsi_instansi ?: '-' }}</dd></div>
-                <div><dt>Website Resmi</dt><dd>@if ($stakeholder->website_resmi)<a href="{{ $stakeholder->website_resmi }}" target="_blank" rel="noopener noreferrer">{{ $stakeholder->website_resmi }}</a>@else - @endif</dd></div>
+                <div><dt>Website Resmi</dt><dd>
+                    @forelse ($websiteLinks as $websiteLink)
+                        @if (trim($websiteLink[1]) !== ''){{ trim($websiteLink[1]) }} @endif<a href="{{ $websiteLink[2] }}" target="_blank" rel="noopener noreferrer">{{ $websiteLink[2] }}</a>@if (!$loop->last)<br>@endif
+                    @empty
+                        {{ $stakeholder->website_resmi ?: '-' }}
+                    @endforelse
+                </dd></div>
                 <div><dt>Struktur Organisasi</dt><dd>{{ $stakeholder->struktur_organisasi ?: '-' }}</dd></div>
                 <div><dt>Alamat Kantor</dt><dd>{{ $stakeholder->alamat_kantor ?: '-' }}</dd></div>
                 <div><dt>Telepon</dt><dd>{{ $stakeholder->telepon ?: '-' }}</dd></div>

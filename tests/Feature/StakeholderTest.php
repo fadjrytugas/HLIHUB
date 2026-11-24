@@ -44,22 +44,26 @@ class StakeholderTest extends TestCase
             ->assertSee('TOP Priority')
             ->assertSee('Fungsi Instansi');
 
-        $this->post(route('stakeholders.store'), [
+        $response = $this->post(route('stakeholders.store'), [
             'nama' => 'Stakeholder CRUD Test Unique',
             'prioritas' => 'TOP PRIORITY',
             'fungsi_instansi' => 'Fungsi instansi test',
-            'website_resmi' => 'https://example.test',
+            'website_resmi' => 'Presiden RI: https://example.test & Wapres RI: https://www.example.test',
             'struktur_organisasi' => 'Struktur organisasi test',
             'alamat_kantor' => 'Alamat kantor test',
             'telepon' => '021123',
             'fax' => '021456',
             'email_perusahaan' => 'stakeholder@example.test',
-        ])->assertRedirect()->assertSessionHasNoErrors();
+        ]);
 
         $stakeholder = Stakeholder::query()
             ->where('nama', 'Stakeholder CRUD Test Unique')
             ->firstOrFail();
+        $response->assertRedirect(route('stakeholders.show', $stakeholder))
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('success');
         $this->assertSame('TOP PRIORITY', $stakeholder->prioritas);
+        $this->assertSame('Presiden RI: https://example.test & Wapres RI: https://www.example.test', $stakeholder->website_resmi);
         $this->get(route('stakeholders.index'))
             ->assertOk()
             ->assertSee('Stakeholder CRUD Test Unique')
@@ -67,7 +71,10 @@ class StakeholderTest extends TestCase
         $this->get(route('stakeholders.show', $stakeholder))
             ->assertOk()
             ->assertSee('Fungsi instansi test')
-            ->assertSee('https://example.test');
+            ->assertSee('https://example.test')
+            ->assertSee('https://www.example.test')
+            ->assertSee('Presiden RI:')
+            ->assertSee('Wapres RI:');
 
         $this->put(route('stakeholders.update', $stakeholder), [
             'nama' => 'Stakeholder CRUD Test Updated',
@@ -85,6 +92,22 @@ class StakeholderTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseMissing('stakeholders', ['id' => $stakeholder->id]);
+    }
+
+    public function test_invalid_stakeholder_websites_are_reported_and_not_saved(): void
+    {
+        $this->from(route('stakeholders.index'))
+            ->post(route('stakeholders.store'), [
+                'nama' => 'Stakeholder Website Validation Test',
+                'prioritas' => 'TOP PRIORITY',
+                'website_resmi' => 'bukan-url',
+            ])
+            ->assertRedirect(route('stakeholders.index'))
+            ->assertSessionHasErrors('website_resmi');
+
+        $this->assertDatabaseMissing('stakeholders', [
+            'nama' => 'Stakeholder Website Validation Test',
+        ]);
     }
 
     public function test_member_profile_and_photo_can_be_created_updated_and_deleted(): void
