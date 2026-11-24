@@ -135,65 +135,64 @@
                             Lihat profil lengkap <span aria-hidden="true">↗</span>
                         </button>
                         <dialog class="stakeholder-member-profile-modal" id="member-profile-{{ $member->id }}" aria-labelledby="member-profile-title-{{ $member->id }}">
-                            <div class="stakeholder-member-profile-modal__header">
-                                <div class="stakeholder-member-profile-modal__identity">
-                                    <div class="stakeholder-member-avatar stakeholder-member-profile-modal__avatar">
-                                        @if ($member->foto_path)
-                                            <img src="{{ route('stakeholders.members.photo', [$stakeholder, $member]) }}" alt="Foto {{ $member->nama_lengkap }}">
-                                        @else
-                                            <span aria-hidden="true">{{ mb_strtoupper(mb_substr($member->nama_lengkap, 0, 1)) }}</span>
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <span class="section-kicker">Profil anggota stakeholder</span>
+                            <button class="stakeholder-member-profile-modal__close" type="button" data-close-member-profile aria-label="Tutup profil anggota">&times;</button>
+                            <div class="stakeholder-member-profile-modal__layout">
+                                <div class="stakeholder-member-profile-modal__photo">
+                                    @if ($member->foto_path)
+                                        <img src="{{ route('stakeholders.members.photo', [$stakeholder, $member]) }}" alt="Foto {{ $member->nama_lengkap }}">
+                                    @else
+                                        <span aria-hidden="true">{{ mb_strtoupper(mb_substr($member->nama_lengkap, 0, 1)) }}</span>
+                                    @endif
+                                </div>
+                                <div class="stakeholder-member-profile-modal__body">
+                                    <div class="stakeholder-member-profile-modal__heading">
+                                        <span class="section-kicker">{{ $stakeholder->nama }}</span>
                                         <h3 id="member-profile-title-{{ $member->id }}">{{ $member->nama_lengkap }}</h3>
-                                        <p>{{ $member->jabatan ?: 'Jabatan belum diisi' }}</p>
+                                        @if ($member->jabatan)<p>{{ $member->jabatan }}</p>@endif
+                                    </div>
+                                    <dl class="stakeholder-member-profile">
+                                        <div class="stakeholder-member-profile__wide"><dt>Tempat dan tanggal lahir</dt><dd>{{ trim(($member->tempat_lahir ?: '-') . ', ' . ($member->tanggal_lahir?->format('d F Y') ?: '-'), ', ') }}</dd></div>
+                                        <div class="stakeholder-member-profile__wide"><dt>Riwayat Pendidikan</dt><dd>{{ $member->riwayat_pendidikan ?: '-' }}</dd></div>
+                                        <div class="stakeholder-member-profile__wide"><dt>Jabatan</dt><dd>{{ $member->jabatan ?: '-' }}</dd></div>
+                                        <div><dt>Nama Panggilan</dt><dd>{{ $member->nama_panggilan ?: '-' }}</dd></div>
+                                        <div><dt>Jenis Kelamin</dt><dd>{{ $member->jenis_kelamin ?: '-' }}</dd></div>
+                                        <div><dt>Nama Istri/Suami</dt><dd>{{ $member->nama_pasangan ?: '-' }}</dd></div>
+                                        <div><dt>Nama Anak</dt><dd>{{ $member->nama_anak ?: '-' }}</dd></div>
+                                        <div><dt>Nama Keluarga Lainnya</dt><dd>{{ $member->nama_keluarga_lainnya ?: '-' }}</dd></div>
+                                        <div><dt>Media Sosial</dt><dd>{{ $member->media_sosial ?: '-' }}</dd></div>
+                                        <div><dt>Telepon Protokol</dt><dd>{{ $member->telepon_protokol ?: '-' }}</dd></div>
+                                        <div><dt>Telepon Sekretaris</dt><dd>{{ $member->telepon_sekretaris ?: '-' }}</dd></div>
+                                        <div><dt>Telepon Staff</dt><dd>{{ $member->telepon_staff ?: '-' }}</dd></div>
+                                        <div><dt>Hobi</dt><dd>{{ $member->hobi ?: '-' }}</dd></div>
+                                        <div><dt>Makanan Favorit</dt><dd>{{ $member->makanan_favorit ?: '-' }}</dd></div>
+                                        <div><dt>Minuman Favorit</dt><dd>{{ $member->minuman_favorit ?: '-' }}</dd></div>
+                                        <div><dt>Olahraga Favorit</dt><dd>{{ $member->olahraga_favorit ?: '-' }}</dd></div>
+                                        <div class="stakeholder-member-profile__wide"><dt>Sumber Data</dt><dd>
+                                            @if ($member->sumber_data_url)
+                                                <a href="{{ $member->sumber_data_url }}" target="_blank" rel="noopener noreferrer">{{ $member->sumber_data_url }}</a>
+                                            @else
+                                                Belum dicantumkan
+                                            @endif
+                                        </dd></div>
+                                    </dl>
+                                    <div class="stakeholder-member-actions">
+                                        <details class="stakeholder-member-edit">
+                                            <summary class="legal-secondary-button">Edit Anggota</summary>
+                                            <form class="stakeholder-form stakeholder-member-form" method="POST" action="{{ route('stakeholders.members.update', [$stakeholder, $member]) }}" enctype="multipart/form-data">
+                                                @csrf
+                                                @method('PUT')
+                                                <h3>Edit {{ $member->nama_lengkap }}</h3>
+                                                @include('stakeholder.partials.member-fields', ['member' => $member, 'formId' => 'edit-member-' . $member->id])
+                                                <div class="stakeholder-form__actions"><button class="legal-primary-button" type="submit">Simpan Perubahan</button></div>
+                                            </form>
+                                        </details>
+                                        <form method="POST" action="{{ route('stakeholders.members.destroy', [$stakeholder, $member]) }}" data-confirm="Hapus anggota {{ $member->nama_lengkap }}?">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="legal-danger-button" type="submit">Hapus Anggota</button>
+                                        </form>
                                     </div>
                                 </div>
-                                <button class="legal-product-edit-modal__close" type="button" data-close-member-profile aria-label="Tutup profil anggota">&times;</button>
-                            </div>
-                            <div class="stakeholder-member-profile-modal__content">
-                            <dl class="stakeholder-member-profile">
-                                <div><dt>Nama Panggilan</dt><dd>{{ $member->nama_panggilan ?: '-' }}</dd></div>
-                                <div><dt>Jenis Kelamin</dt><dd>{{ $member->jenis_kelamin ?: '-' }}</dd></div>
-                                <div><dt>Tempat, Tanggal Lahir</dt><dd>{{ trim(($member->tempat_lahir ?: '-') . ', ' . ($member->tanggal_lahir?->format('d M Y') ?: '-'), ', ') }}</dd></div>
-                                <div><dt>Nama Istri/Suami</dt><dd>{{ $member->nama_pasangan ?: '-' }}</dd></div>
-                                <div><dt>Nama Anak</dt><dd>{{ $member->nama_anak ?: '-' }}</dd></div>
-                                <div><dt>Keluarga Lainnya</dt><dd>{{ $member->nama_keluarga_lainnya ?: '-' }}</dd></div>
-                                <div><dt>Media Sosial</dt><dd>{{ $member->media_sosial ?: '-' }}</dd></div>
-                                <div><dt>No. Tlp. Protokol</dt><dd>{{ $member->telepon_protokol ?: '-' }}</dd></div>
-                                <div><dt>No. Tlp. Sekretaris</dt><dd>{{ $member->telepon_sekretaris ?: '-' }}</dd></div>
-                                <div><dt>No. Tlp. Staff</dt><dd>{{ $member->telepon_staff ?: '-' }}</dd></div>
-                                <div><dt>Hobi</dt><dd>{{ $member->hobi ?: '-' }}</dd></div>
-                                <div><dt>Makanan Favorit</dt><dd>{{ $member->makanan_favorit ?: '-' }}</dd></div>
-                                <div><dt>Minuman Favorit</dt><dd>{{ $member->minuman_favorit ?: '-' }}</dd></div>
-                                <div><dt>Olahraga Favorit</dt><dd>{{ $member->olahraga_favorit ?: '-' }}</dd></div>
-                                <div class="stakeholder-member-profile__wide"><dt>Riwayat Pendidikan</dt><dd>{{ $member->riwayat_pendidikan ?: '-' }}</dd></div>
-                                <div class="stakeholder-member-profile__wide"><dt>Sumber Data</dt><dd>
-                                    @if ($member->sumber_data_url)
-                                        <a href="{{ $member->sumber_data_url }}" target="_blank" rel="noopener noreferrer">{{ $member->sumber_data_url }}</a>
-                                    @else
-                                        Belum dicantumkan
-                                    @endif
-                                </dd></div>
-                            </dl>
-                            <div class="stakeholder-member-actions">
-                                <details class="stakeholder-member-edit">
-                                    <summary class="legal-secondary-button">Edit Anggota</summary>
-                                    <form class="stakeholder-form stakeholder-member-form" method="POST" action="{{ route('stakeholders.members.update', [$stakeholder, $member]) }}" enctype="multipart/form-data">
-                                        @csrf
-                                        @method('PUT')
-                                        <h3>Edit {{ $member->nama_lengkap }}</h3>
-                                        @include('stakeholder.partials.member-fields', ['member' => $member, 'formId' => 'edit-member-' . $member->id])
-                                        <div class="stakeholder-form__actions"><button class="legal-primary-button" type="submit">Simpan Perubahan</button></div>
-                                    </form>
-                                </details>
-                                <form method="POST" action="{{ route('stakeholders.members.destroy', [$stakeholder, $member]) }}" data-confirm="Hapus anggota {{ $member->nama_lengkap }}?">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="legal-danger-button" type="submit">Hapus Anggota</button>
-                                </form>
-                            </div>
                             </div>
                         </dialog>
                     </article>
